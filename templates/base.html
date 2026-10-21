@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bulk Data Import System{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --sidebar-w: 250px;
+            --primary: #0d6efd;
+            --sidebar-bg: #121f2e;
+            --sidebar-bg-2: #1d2b3a;
+            --radius: 0.9rem;
+            --shadow: 0 2px 10px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.10);
+            --anim-fast: 0.2s ease;
+            --anim-med: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * { scroll-behavior: smooth; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c3ccd6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9aa7b5; }
+
+        body {
+            background: #f4f6f9;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            background: linear-gradient(180deg, var(--sidebar-bg) 0%, var(--sidebar-bg-2) 100%);
+            padding-top: 1rem;
+            z-index: 1040;
+            transition: transform var(--anim-med);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .brand {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.15rem;
+            padding: 0.5rem 1.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            letter-spacing: 0.3px;
+        }
+        .sidebar .brand .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 0.6rem;
+            background: linear-gradient(135deg, #0d6efd, #4d94ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(13,110,253,0.35);
+            transition: transform var(--anim-fast);
+        }
+        .sidebar .brand:hover .brand-icon { transform: rotate(-8deg) scale(1.05); }
+
+        .sidebar .nav-link {
+            color: #aebfd0;
+            padding: 0.7rem 1.5rem;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            position: relative;
+            transition: color var(--anim-fast), background var(--anim-fast), padding-left var(--anim-fast);
+        }
+        .sidebar .nav-link i { font-size: 1.05rem; min-width: 1.25rem; }
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+            border-left-color: var(--primary);
+            padding-left: 1.75rem;
+        }
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: rgba(13, 110, 253, 0.15);
+            border-left-color: var(--primary);
+        }
+        .sidebar .nav-link.active::after {
+            content: '';
+            position: absolute;
+            right: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13,110,253,0.25);
+        }
+
+        /* ============ MAIN ============ */
+        .main {
+            margin-left: var(--sidebar-w);
+            padding: 1.5rem 2rem 3rem;
+            min-height: 100vh;
+            transition: margin-left var(--anim-med);
+            animation: fadeSlideIn var(--anim-med) both;
+        }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        /* ============ CARDS & REVEAL ============ */
+        .stat-card {
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: transform var(--anim-med), box-shadow var(--anim-med);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============ TOASTS ============ */
+        .toast-container { z-index: 1080; }
+
+        /* ============ MOBILE MENU BAR ============ */
+        .mobile-topbar {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: var(--sidebar-bg);
+            color: #fff;
+            padding: 0.6rem 1rem;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+        }
+        .mobile-topbar .btn-icon {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--anim-fast), transform var(--anim-fast);
+        }
+        .mobile-topbar .btn-icon:hover { background: rgba(255,255,255,0.22); }
+        .mobile-topbar .btn-icon:active { transform: scale(0.92); }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 20, 30, 0.5);
+            z-index: 1035;
+            opacity: 0;
+            transition: opacity var(--anim-med);
+        }
+        .sidebar-backdrop.show { opacity: 1; }
+
+        .table > :not(caption) > * > * { vertical-align: middle; }
+
+        .badge-soft {
+            font-weight: 600;
+            padding: 0.4em 0.75em;
+            border-radius: 0.5rem;
+        }
+
+        /* Fade-in rows on tables */
+        @keyframes rowIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        tbody tr { animation: rowIn 0.35s ease both; }
+        tbody tr:nth-child(2) { animation-delay: 0.03s; }
+        tbody tr:nth-child(3) { animation-delay: 0.06s; }
+        tbody tr:nth-child(4) { animation-delay: 0.09s; }
+        tbody tr:nth-child(5) { animation-delay: 0.12s; }
+        tbody tr:nth-child(6) { animation-delay: 0.15s; }
+        tbody tr:nth-child(7) { animation-delay: 0.18s; }
+        tbody tr:nth-child(8) { animation-delay: 0.21s; }
+        tbody tr:nth-child(9) { animation-delay: 0.24s; }
+        tbody tr:nth-child(10) { animation-delay: 0.27s; }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 991.98px) {
+            .mobile-topbar { display: flex; }
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: 4px 0 30px rgba(0,0,0,0.25);
+            }
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open .sidebar-backdrop { display: block; opacity: 1; }
+            body.sidebar-open { overflow: hidden; }
+            .main { margin-left: 0; padding: 1.25rem; }
+        }
+
+        /* Hide table on very small screens, show stacked cards */
+        @media (max-width: 575.98px) {
+            .d-sm-none-responsive { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Mobile top bar (hamburger) -->
+<div class="mobile-topbar">
+    <button type="button" class="btn-icon" id="sidebar-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <i class="bi bi-list fs-4"></i>
+    </button>
+    <span class="fw-bold"><i class="bi bi-box-arrow-in-down me-2"></i>Bulk Import</span>
+    <span class="d-inline-flex" style="width:40px;"></span>
+</div>
+
+<!-- Backdrop -->
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+    <div class="brand">
+        <span class="brand-icon"><i class="bi bi-box-arrow-in-down"></i></span>
+        Bulk Import
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'importer:dashboard' %}" data-nav>
+                <i class="bi bi-speedometer2"></i>Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'upload' %}active{% endif %}" href="{% url 'importer:upload' %}" data-nav>
+                <i class="bi bi-cloud-upload"></i>Upload Import
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'records' %}active{% endif %}" href="{% url 'importer:records' %}" data-nav>
+                <i class="bi bi-people"></i>Student Records
+            </a>
+        </li>
+    </ul>
+    <div class="mt-auto p-3 small text-secondary" style="color:#5f7183 !important; font-size:0.72rem; padding-top:6rem;">
+        <i class="bi bi-shield-check me-1"></i>CSV / Excel &rarr; MySQL
+    </div>
+</nav>
+
+<!-- Toast container (populated by app.js) -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Main content -->
+<div class="main">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% load static %}
+<script src="{% static 'importer/app.js' %}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

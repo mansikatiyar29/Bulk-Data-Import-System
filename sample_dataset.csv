@@ -1,0 +1,36 @@
+name,email,phone,age,city,state
+Mansi Sharma,mansi.sharma@gmail.com,9876543210,22,Jaipur,Rajasthan
+Rahul Verma,rahul.verma@gmail.com,9876543211,25,Delhi,Delhi
+Priya Singh,priya.singh@gmail.com,9876543212,30,Mumbai,Maharashtra
+Amit Kumar,amit.kumar@gmail.com,9876543213,28,Bengaluru,Karnataka
+Sneha Patel,sneha.patel@gmail.com,9876543214,24,Ahmedabad,Gujarat
+Vikas Gupta,vikas.gupta@gmail.com,9876543215,26,Chennai,Tamil Nadu
+Anita Desai,anita.desai@gmail.com,9876543216,35,Pune,Maharashtra
+Rohit Sharma,rohit.sharma@gmail.com,9876543217,29,Hyderabad,Telangana
+Kiran Rao,kiran.rao@gmail.com,9876543218,23,Kolkata,West Bengal
+Neha Mehta,neha.mehta@gmail.com,9876543219,27,Chandigarh,Chandigarh
+Arjun Nair,arjun.nair@gmail.com,9876543220,31,Kochi,Kerala
+Pooja Yadav,pooja.yadav@gmail.com,9876543221,21,Indore,Madhya Pradesh
+Sandeep Joshi,sandeep.joshi@gmail.com,9876543222,32,Nagpur,Maharashtra
+Disha Kapoor,disha.kapoor@gmail.com,9876543223,20,Surat,Gujarat
+Nikhil Joshi,nikhil.joshi@gmail.com,9876543224,33,Patna,Bihar
+Shreya Iyer,shreya.iyer@gmail.com,9876543225,24,Bhopal,Madhya Pradesh
+Rajat Sharma,rajat.sharma@gmail.com,9876543226,27,Lucknow,Uttar Pradesh
+Mansi Sharma,abc.com,9876543227,22,Jaipur,Rajasthan
+Rahul Verma,rahul.verma@gmail.com,9876543228,25,Delhi,Delhi
+Priya Singh,priya.singh@gmail.com,9876543229,30,Mumbai,Maharashtra
+Invalid Phone,invalid.phone@gmail.com,12345,22,Delhi,Delhi
+Negative Age,negative.age@gmail.com,9876543230,-5,Delhi,Delhi
+Too Old,too.old@gmail.com,9876543231,150,Mumbai,Maharashtra
+Missing Name,,9876543232,22,Delhi,Delhi
+Whitespace Name,  ,9876543233,22,Delhi,Delhi
+Missing Age,missing.age@gmail.com,9876543234,,Delhi,Delhi
+Non Numeric Age,non.numeric@gmail.com,9876543235,twenty,Delhi,Delhi
+ Missing City ,missing.city@gmail.com,9876543236,22,,Delhi
+   ,whitespace.only@gmail.com,9876543237,22,   ,Delhi
+Short Phone,short.phone@gmail.com,98765,22,Delhi,Delhi
+Non Indian Phone,nonindian@gmail.com,1234567890,22,Delhi,Delhi
+Valid But Duplicate,valid.duplicate@gmail.com,9876543238,22,Goa,Goa
+Valid But Duplicate,valid.duplicate@gmail.com,9876543239,23,Goa,Goa
+Great Email,great.email@gmail.com,9876543240,18,Mysuru,Karnataka
+Last Valid,last.valid@gmail.com,9876543241,19,Noida,Uttar Pradesh

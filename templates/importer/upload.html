@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% block title %}Upload &amp; Import — Bulk Data Import System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h1 class="page-title">
+        <i class="bi bi-cloud-upload text-primary"></i>Bulk Data Import
+    </h1>
+    <span class="text-muted small"><i class="bi bi-arrow-right me-1"></i>CSV / Excel &rarr; MySQL</span>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card stat-card reveal">
+            <div class="card-body p-4">
+                <h5 class="card-title fw-semibold mb-1">
+                    <i class="bi bi-cloud-upload text-primary me-2"></i>Upload CSV / Excel File
+                </h5>
+                <p class="text-muted small mb-4">
+                    Drag &amp; drop your file below, or click to browse. Max size 5&nbsp;MB.
+                </p>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" data-autodismiss="6000">
+                        <i class="bi bi-x-octagon me-1"></i>
+                        {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" id="upload-form">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.file.id_for_label }}" class="form-label fw-semibold d-none">
+                            {{ form.file.label }}
+                        </label>
+
+                        <!-- Dropzone wrapper -->
+                        <div id="drop-zone" class="drop-zone {% if form.file.errors %}is-invalid{% endif %}" tabindex="0" role="button" aria-label="Choose a file to upload">
+                            <div class="dz-inner" id="dz-inner">
+                                <div class="dz-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                                <div class="dz-title">Drop your file here</div>
+                                <div class="dz-sub">or <span class="text-primary fw-semibold text-decoration-underline">browse files</span></div>
+                                <div class="dz-formats mt-2">
+                                    <span class="badge text-bg-light border"><i class="bi bi-filetype-csv me-1"></i>CSV</span>
+                                    <span class="badge text-bg-light border"><i class="bi bi-file-earmark-excel me-1"></i>XLSX</span>
+                                </div>
+                            </div>
+                            <!-- Selected file card -->
+                            <div class="dz-file d-none" id="dz-file">
+                                <div class="dz-file-icon"><i class="bi bi-file-earmark-check-fill"></i></div>
+                                <div class="dz-file-meta">
+                                    <div class="dz-file-name text-break" id="dz-file-name"></div>
+                                    <div class="dz-file-size" id="dz-file-size"></div>
+                                </div>
+                                <button type="button" class="btn-close" id="dz-remove" aria-label="Remove file"></button>
+                            </div>
+                        </div>
+
+                        <input type="file"
+                               name="{{ form.file.name }}"
+                               id="{{ form.file.id_for_label }}"
+                               class="d-none"
+                               accept=".csv,.xlsx">
+
+                        {% if form.file.errors %}
+                            <div class="text-danger small mt-2">
+                                {% for e in form.file.errors %}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ e }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="form-text">Required columns: <strong>name, email, phone, age, city, state</strong>.</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Upload progress (visible while importing) -->
+                    <div id="upload-progress" class="d-none mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="fw-semibold"><i class="bi bi-arrow-repeat me-1 upload-spin"></i>Importing…</span>
+                            <span id="progress-pct">0%</span>
+                        </div>
+                        <div class="progress" style="height:14px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                 style="width: 0%;" id="progress-bar"></div>
+                        </div>
+                        <div class="text-muted small mt-1" id="progress-note">
+                            Validating rows, checking duplicates and inserting records…
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100" id="upload-btn" disabled>
+                        <i class="bi bi-play-fill me-1"></i> Upload &amp; Import
+                    </button>
+                </form>
+
+                <div id="file-preview" class="small mt-2"></div>
+
+                <hr class="my-4">
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <h6 class="fw-semibold mb-2"><i class="bi bi-info-circle me-1 text-primary"></i>Supported Formats</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge text-bg-light border"><i class="bi bi-filetype-csv me-1"></i>CSV</span>
+                            <span class="badge text-bg-light border"><i class="bi bi-file-earmark-excel me-1"></i>XLSX (Excel)</span>
+                            <span class="badge text-bg-light border"><i class="bi bi-hdd me-1"></i>Max size: 5 MB</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <h6 class="fw-semibold mb-2"><i class="bi bi-list-check me-1 text-primary"></i>Required Columns</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge text-bg-dark">name</span>
+                            <span class="badge text-bg-dark">email</span>
+                            <span class="badge text-bg-dark">phone</span>
+                            <span class="badge text-bg-dark">age</span>
+                            <span class="badge text-bg-dark">city</span>
+                            <span class="badge text-bg-dark">state</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live template columns hint, shown while a file is picked -->
+        <div class="card stat-card mt-3 d-none" id="template-card">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-2"><i class="bi bi-layout-text-window me-1 text-primary"></i>Template</h6>
+                <p class="text-muted small mb-2">Headers this file should contain (first row):</p>
+                <div class="bg-light border rounded p-2 font-monospace small overflow-auto text-nowrap">
+                    name, email, phone, age, city, state
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% load static %}
+<script src="{% static 'importer/upload.js' %}" defer></script>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .upload-spin { display: inline-block; animation: fa-spin 1s linear infinite; }
+    @keyframes fa-spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}
